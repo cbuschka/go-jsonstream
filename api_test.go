@@ -2,6 +2,7 @@ package jsonstream
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -121,4 +122,19 @@ func TestWritesObjectWithMutiplePropertiesNoIndentViaWriter(t *testing.T) {
 		}
 		return wr.WriteObjectEnd()
 	})
+}
+
+func TestFailsOnCloseIfNotInEndState(t *testing.T) {
+	buf := new(bytes.Buffer)
+	wr := NewWriter(buf).(*tokenWriter)
+	wr.SetIndent("")
+
+	err := wr.WriteArrayStart()
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+
+	err = wr.Close()
+	assert.Equal(t, fmt.Errorf("not in end state"), err)
 }

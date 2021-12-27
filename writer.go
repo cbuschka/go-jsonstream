@@ -465,6 +465,10 @@ func (t *tokenWriter) Close() error {
 		return closer.Close()
 	}
 
+	if t.stateStack.Peek() != TWS_END {
+		return fmt.Errorf("not in end state")
+	}
+
 	return nil
 }
 
