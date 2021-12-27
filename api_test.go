@@ -30,21 +30,21 @@ func testProducesJsonViaWriter(t *testing.T, expectedJson string, writeFunc func
 func TestWritesStringViaWriter(t *testing.T) {
 	expectedJson := "\"value\""
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.String("value")
+		return wr.StringValue("value")
 	})
 }
 
 func TestWritesNullViaWriter(t *testing.T) {
 	expectedJson := "null"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.Null()
+		return wr.NullValue()
 	})
 }
 
 func TestWritesTrueViaWriter(t *testing.T) {
 	expectedJson := "true"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.Boolean(true)
+		return wr.BooleanValue(true)
 	})
 }
 
@@ -77,11 +77,11 @@ func TestWritesStringArrayNoIndentViaWritert(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		err = wr.String("value0")
+		err = wr.StringValue("value0")
 		if err != nil {
 			return err
 		}
-		err = wr.String("value1")
+		err = wr.StringValue("value1")
 		if err != nil {
 			return err
 		}

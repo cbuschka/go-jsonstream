@@ -461,19 +461,19 @@ func (t *tokenWriter) StartArray() error {
 func (t *tokenWriter) EndArray() error {
 	return t.WriteToken(Token{Type: TT_ARRAY_END, Value: ""})
 }
-func (t *tokenWriter) String(value string) error {
+func (t *tokenWriter) StringValue(value string) error {
 	return t.WriteToken(Token{Type: TT_STRING_VALUE, Value: value})
 }
-func (t *tokenWriter) Boolean(value bool) error {
+func (t *tokenWriter) BooleanValue(value bool) error {
 	if value {
 		return t.WriteToken(Token{Type: TT_TRUE_VALUE, Value: ""})
 	}
 	return t.WriteToken(Token{Type: TT_FALSE_VALUE, Value: ""})
 }
-func (t *tokenWriter) Number(value int) error {
+func (t *tokenWriter) NumberValue(value int) error {
 	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: strconv.Itoa(value)})
 }
-func (t *tokenWriter) Null() error {
+func (t *tokenWriter) NullValue() error {
 	return t.WriteToken(Token{Type: TT_NULL_VALUE, Value: ""})
 }
 
@@ -513,7 +513,7 @@ func (t *tokenWriter) KeyAndStringValue(key string, value string) error {
 		return err
 	}
 
-	return t.String(value)
+	return t.StringValue(value)
 }
 
 func (t *tokenWriter) KeyAndBooleanValue(key string, value bool) error {
@@ -522,7 +522,7 @@ func (t *tokenWriter) KeyAndBooleanValue(key string, value bool) error {
 		return err
 	}
 
-	return t.Boolean(value)
+	return t.BooleanValue(value)
 }
 
 func (t *tokenWriter) KeyAndNumberValue(key string, value int) error {
@@ -531,7 +531,7 @@ func (t *tokenWriter) KeyAndNumberValue(key string, value int) error {
 		return err
 	}
 
-	return t.Number(value)
+	return t.NumberValue(value)
 }
 
 func (t *tokenWriter) KeyAndNull(key string) error {
@@ -540,5 +540,5 @@ func (t *tokenWriter) KeyAndNull(key string) error {
 		return err
 	}
 
-	return t.Null()
+	return t.NullValue()
 }

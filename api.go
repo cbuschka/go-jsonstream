@@ -10,10 +10,10 @@ type Writer interface {
 	KeyAndNull(key string) error
 	StartArray() error
 	EndArray() error
-	String(value string) error
-	Boolean(value bool) error
-	Number(value int) error
-	Null() error
+	StringValue(value string) error
+	BooleanValue(value bool) error
+	NumberValue(value int) error
+	NullValue() error
 	SetIndent(indent string)
 	Close() error
 }
