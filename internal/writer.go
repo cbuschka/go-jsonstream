@@ -1,4 +1,4 @@
-package jsonstream
+package internal
 
 import (
 	"fmt"
@@ -70,22 +70,22 @@ var (
 	sPACE_BYTES               = []byte(" ")
 )
 
-type tokenWriter struct {
+type TokenWriter struct {
 	wr          io.Writer
 	indent      string
 	indentLevel int
 	stateStack  tokenWriterStateStack
 }
 
-func NewWriter(wr io.Writer) Writer {
-	return Writer(&tokenWriter{wr: wr, indent: "", indentLevel: 0, stateStack: tokenWriterStateStack{TWS_INITIAL}})
+func NewTokenWriter(wr io.Writer) *TokenWriter {
+	return &TokenWriter{wr: wr, indent: "", indentLevel: 0, stateStack: tokenWriterStateStack{TWS_INITIAL}}
 }
 
-func (t *tokenWriter) SetIndent(indent string) {
+func (t *TokenWriter) SetIndent(indent string) {
 	t.indent = indent
 }
 
-func (t *tokenWriter) WriteTokens(tokens ...Token) error {
+func (t *TokenWriter) WriteTokens(tokens ...Token) error {
 	for _, token := range tokens {
 		err := t.WriteToken(token)
 		if err != nil {
@@ -96,7 +96,7 @@ func (t *tokenWriter) WriteTokens(tokens ...Token) error {
 	return nil
 }
 
-func (t *tokenWriter) checkTokenAllowed(currTokenType TokenType, allowedStates ...tokenWriterState) error {
+func (t *TokenWriter) checkTokenAllowed(currTokenType TokenType, allowedStates ...tokenWriterState) error {
 	currState := t.stateStack.Peek()
 	for _, allowedState := range allowedStates {
 		if allowedState == currState {
@@ -107,7 +107,7 @@ func (t *tokenWriter) checkTokenAllowed(currTokenType TokenType, allowedStates .
 	return fmt.Errorf("%s not allowed in %s", currTokenType.Name(), currState.Name())
 }
 
-func (t *tokenWriter) WriteToken(token Token) error {
+func (t *TokenWriter) WriteToken(token Token) error {
 
 	err := t.addMissingTokens(token)
 	if err != nil {
@@ -437,7 +437,7 @@ func (t *tokenWriter) WriteToken(token Token) error {
 	}
 }
 
-func (t *tokenWriter) writeIndent() error {
+func (t *TokenWriter) writeIndent() error {
 	for i := 0; i < t.indentLevel; i++ {
 		_, err := t.wr.Write([]byte(t.indent))
 		if err != nil {
@@ -448,7 +448,7 @@ func (t *tokenWriter) writeIndent() error {
 	return nil
 }
 
-func (t *tokenWriter) writeBytes(bss ...[]byte) error {
+func (t *TokenWriter) writeBytes(bss ...[]byte) error {
 	for _, bs := range bss {
 		_, err := t.wr.Write(bs)
 		if err != nil {
@@ -459,7 +459,7 @@ func (t *tokenWriter) writeBytes(bss ...[]byte) error {
 	return nil
 }
 
-func (t *tokenWriter) Close() error {
+func (t *TokenWriter) Close() error {
 	closer, isCloser := t.wr.(io.Closer)
 	if isCloser {
 		return closer.Close()
@@ -472,41 +472,41 @@ func (t *tokenWriter) Close() error {
 	return nil
 }
 
-func (t *tokenWriter) WriteObjectStart() error {
+func (t *TokenWriter) WriteObjectStart() error {
 	return t.WriteToken(Token{Type: TT_OBJECT_START, Value: ""})
 }
-func (t *tokenWriter) WriteObjectEnd() error {
+func (t *TokenWriter) WriteObjectEnd() error {
 	return t.WriteToken(Token{Type: TT_OBJECT_END, Value: ""})
 }
-func (t *tokenWriter) WriteKey(key string) error {
+func (t *TokenWriter) WriteKey(key string) error {
 	return t.WriteToken(Token{Type: TT_KEY, Value: key})
 }
-func (t *tokenWriter) WriteArrayStart() error {
+func (t *TokenWriter) WriteArrayStart() error {
 	return t.WriteToken(Token{Type: TT_ARRAY_START, Value: ""})
 }
-func (t *tokenWriter) WriteArrayEnd() error {
+func (t *TokenWriter) WriteArrayEnd() error {
 	return t.WriteToken(Token{Type: TT_ARRAY_END, Value: ""})
 }
-func (t *tokenWriter) WriteStringValue(value string) error {
+func (t *TokenWriter) WriteStringValue(value string) error {
 	return t.WriteToken(Token{Type: TT_STRING_VALUE, Value: value})
 }
-func (t *tokenWriter) WriteBooleanValue(value bool) error {
+func (t *TokenWriter) WriteBooleanValue(value bool) error {
 	if value {
 		return t.WriteToken(Token{Type: TT_TRUE_VALUE, Value: ""})
 	}
 	return t.WriteToken(Token{Type: TT_FALSE_VALUE, Value: ""})
 }
-func (t *tokenWriter) WriteNumberValue(value float64) error {
+func (t *TokenWriter) WriteNumberValue(value float64) error {
 	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: fmt.Sprintf("%e", value)})
 }
-func (t *tokenWriter) WriteIntegerValue(value int) error {
+func (t *TokenWriter) WriteIntegerValue(value int) error {
 	return t.WriteToken(Token{Type: TT_INTEGER_VALUE, Value: strconv.Itoa(value)})
 }
-func (t *tokenWriter) WriteNullValue() error {
+func (t *TokenWriter) WriteNullValue() error {
 	return t.WriteToken(Token{Type: TT_NULL_VALUE, Value: ""})
 }
 
-func (t *tokenWriter) addMissingTokens(token Token) error {
+func (t *TokenWriter) addMissingTokens(token Token) error {
 
 	currentState := t.stateStack.Peek()
 	followsValue := token.Type == TT_NUMBER_VALUE ||
@@ -537,7 +537,7 @@ func (t *tokenWriter) addMissingTokens(token Token) error {
 	return nil
 }
 
-func (t *tokenWriter) WriteKeyAndStringValue(key string, value string) error {
+func (t *TokenWriter) WriteKeyAndStringValue(key string, value string) error {
 	err := t.WriteKey(key)
 	if err != nil {
 		return err
@@ -546,7 +546,7 @@ func (t *tokenWriter) WriteKeyAndStringValue(key string, value string) error {
 	return t.WriteStringValue(value)
 }
 
-func (t *tokenWriter) WriteKeyAndBooleanValue(key string, value bool) error {
+func (t *TokenWriter) WriteKeyAndBooleanValue(key string, value bool) error {
 	err := t.WriteKey(key)
 	if err != nil {
 		return err
@@ -555,7 +555,7 @@ func (t *tokenWriter) WriteKeyAndBooleanValue(key string, value bool) error {
 	return t.WriteBooleanValue(value)
 }
 
-func (t *tokenWriter) WriteKeyAndNumberValue(key string, value float64) error {
+func (t *TokenWriter) WriteKeyAndNumberValue(key string, value float64) error {
 	err := t.WriteKey(key)
 	if err != nil {
 		return err
@@ -564,7 +564,7 @@ func (t *tokenWriter) WriteKeyAndNumberValue(key string, value float64) error {
 	return t.WriteNumberValue(value)
 }
 
-func (t *tokenWriter) WriteKeyAndIntegerValue(key string, value int) error {
+func (t *TokenWriter) WriteKeyAndIntegerValue(key string, value int) error {
 	err := t.WriteKey(key)
 	if err != nil {
 		return err
@@ -573,7 +573,7 @@ func (t *tokenWriter) WriteKeyAndIntegerValue(key string, value int) error {
 	return t.WriteIntegerValue(value)
 }
 
-func (t *tokenWriter) WriteKeyAndNullValue(key string) error {
+func (t *TokenWriter) WriteKeyAndNullValue(key string) error {
 	err := t.WriteKey(key)
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package jsonstream
+package internal
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 
 func testProducesJsonViaTokenStream(t *testing.T, indent string, expectedJson string, tokens ...Token) {
 	buf := new(bytes.Buffer)
-	wr := NewWriter(buf).(*tokenWriter)
+	wr := NewTokenWriter(buf)
 	wr.SetIndent(indent)
 
 	err := wr.WriteTokens(tokens...)

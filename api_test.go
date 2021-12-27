@@ -3,13 +3,14 @@ package jsonstream
 import (
 	"bytes"
 	"fmt"
+	"github.com/cbuschka/go-jsonstream/internal"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func testProducesJsonViaWriter(t *testing.T, expectedJson string, writeFunc func(wr Writer) error) {
 	buf := new(bytes.Buffer)
-	wr := NewWriter(buf).(*tokenWriter)
+	wr := NewWriter(buf).(*internal.TokenWriter)
 	wr.SetIndent("")
 
 	err := writeFunc(wr)
@@ -126,7 +127,7 @@ func TestWritesObjectWithMutiplePropertiesNoIndentViaWriter(t *testing.T) {
 
 func TestFailsOnCloseIfNotInEndState(t *testing.T) {
 	buf := new(bytes.Buffer)
-	wr := NewWriter(buf).(*tokenWriter)
+	wr := NewWriter(buf).(*internal.TokenWriter)
 	wr.SetIndent("")
 
 	err := wr.WriteArrayStart()

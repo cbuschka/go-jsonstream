@@ -1,4 +1,4 @@
-package jsonstream
+package internal
 
 type TokenType int
 

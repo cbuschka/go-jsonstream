@@ -1,5 +1,10 @@
 package jsonstream
 
+import (
+	"github.com/cbuschka/go-jsonstream/internal"
+	"io"
+)
+
 type Writer interface {
 	WriteObjectStart() error
 	WriteObjectEnd() error
@@ -18,4 +23,8 @@ type Writer interface {
 	WriteNullValue() error
 	SetIndent(indent string)
 	Close() error
+}
+
+func NewWriter(wr io.Writer) Writer {
+	return Writer(internal.NewTokenWriter(wr))
 }
