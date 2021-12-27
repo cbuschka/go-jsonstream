@@ -497,6 +497,11 @@ func (t *tokenWriter) addMissingTokens(token Token) error {
 		if err != nil {
 			return err
 		}
+	} else if token.Type == TT_KEY && currentState == TWS_IN_OBJECT_PAIR_SEEN {
+		err := t.WriteToken(Token{Type: TT_COMMA, Value: ""})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

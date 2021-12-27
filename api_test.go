@@ -51,7 +51,10 @@ func TestWritesTrueViaWriter(t *testing.T) {
 func TestWritesEmptyObjecViaWritert(t *testing.T) {
 	expectedJson := "{}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		_ = wr.StartObject()
+		err := wr.StartObject()
+		if err != nil {
+			return err
+		}
 		return wr.EndObject()
 	})
 }
@@ -59,7 +62,10 @@ func TestWritesEmptyObjecViaWritert(t *testing.T) {
 func TestWritesEmptyArrayViaWritert(t *testing.T) {
 	expectedJson := "[]"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		_ = wr.StartArray()
+		err := wr.StartArray()
+		if err != nil {
+			return err
+		}
 		return wr.EndArray()
 	})
 }
@@ -67,9 +73,18 @@ func TestWritesEmptyArrayViaWritert(t *testing.T) {
 func TestWritesStringArrayNoIndentViaWritert(t *testing.T) {
 	expectedJson := "[\"value0\",\"value1\"]"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		_ = wr.StartArray()
-		_ = wr.String("value0")
-		_ = wr.String("value1")
+		err := wr.StartArray()
+		if err != nil {
+			return err
+		}
+		err = wr.String("value0")
+		if err != nil {
+			return err
+		}
+		err = wr.String("value1")
+		if err != nil {
+			return err
+		}
 		return wr.EndArray()
 	})
 }
@@ -77,8 +92,33 @@ func TestWritesStringArrayNoIndentViaWritert(t *testing.T) {
 func TestWritesObjectNoIndentViaWritert(t *testing.T) {
 	expectedJson := "{\"key\":\"value\"}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		_ = wr.StartObject()
-		_ = wr.KeyAndStringValue("key", "value")
+		err := wr.StartObject()
+		if err != nil {
+			return err
+		}
+		err = wr.KeyAndStringValue("key", "value")
+		if err != nil {
+			return err
+		}
+		return wr.EndObject()
+	})
+}
+
+func TestWritesObjectWithMutiplePropertiesNoIndentViaWriter(t *testing.T) {
+	expectedJson := "{\"key\":\"value\",\"key2\":\"value2\"}"
+	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
+		err := wr.StartObject()
+		if err != nil {
+			return err
+		}
+		err = wr.KeyAndStringValue("key", "value")
+		if err != nil {
+			return err
+		}
+		err = wr.KeyAndStringValue("key2", "value2")
+		if err != nil {
+			return err
+		}
 		return wr.EndObject()
 	})
 }
