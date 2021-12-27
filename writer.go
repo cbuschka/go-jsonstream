@@ -410,6 +410,28 @@ func (t *tokenWriter) WriteToken(token Token) error {
 		}
 
 		return nil
+	case TT_INTEGER_VALUE:
+		err := t.checkTokenAllowed(token.Type, TWS_INITIAL, TWS_IN_OBJECT_COLON_SEEN, TWS_IN_ARRAY, TWS_IN_ARRAY_COMMA_SEEN)
+		if err != nil {
+			return err
+		}
+
+		_, err = t.wr.Write([]byte(token.Value))
+		if err != nil {
+			return err
+		}
+
+		if t.stateStack.Peek() == TWS_INITIAL {
+			t.stateStack.Replace(TWS_END)
+		} else if t.stateStack.Peek() == TWS_IN_OBJECT_COLON_SEEN {
+			t.stateStack.Replace(TWS_IN_OBJECT_PAIR_SEEN)
+		} else if t.stateStack.Peek() == TWS_IN_ARRAY {
+			t.stateStack.Replace(TWS_IN_ARRAY_ITEM_SEEN)
+		} else if t.stateStack.Peek() == TWS_IN_ARRAY_COMMA_SEEN {
+			t.stateStack.Replace(TWS_IN_ARRAY_ITEM_SEEN)
+		}
+
+		return nil
 	default:
 		return fmt.Errorf("invalid token type: %d", token.Type)
 	}
@@ -470,8 +492,11 @@ func (t *tokenWriter) BooleanValue(value bool) error {
 	}
 	return t.WriteToken(Token{Type: TT_FALSE_VALUE, Value: ""})
 }
-func (t *tokenWriter) NumberValue(value int) error {
-	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: strconv.Itoa(value)})
+func (t *tokenWriter) NumberValue(value float64) error {
+	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: fmt.Sprintf("%e", value)})
+}
+func (t *tokenWriter) IntegerValue(value int) error {
+	return t.WriteToken(Token{Type: TT_INTEGER_VALUE, Value: strconv.Itoa(value)})
 }
 func (t *tokenWriter) NullValue() error {
 	return t.WriteToken(Token{Type: TT_NULL_VALUE, Value: ""})
@@ -481,6 +506,7 @@ func (t *tokenWriter) addMissingTokens(token Token) error {
 
 	currentState := t.stateStack.Peek()
 	followsValue := token.Type == TT_NUMBER_VALUE ||
+		token.Type == TT_INTEGER_VALUE ||
 		token.Type == TT_STRING_VALUE ||
 		token.Type == TT_TRUE_VALUE ||
 		token.Type == TT_FALSE_VALUE ||
@@ -525,7 +551,7 @@ func (t *tokenWriter) KeyAndBooleanValue(key string, value bool) error {
 	return t.BooleanValue(value)
 }
 
-func (t *tokenWriter) KeyAndNumberValue(key string, value int) error {
+func (t *tokenWriter) KeyAndNumberValue(key string, value float64) error {
 	err := t.Key(key)
 	if err != nil {
 		return err
@@ -534,7 +560,16 @@ func (t *tokenWriter) KeyAndNumberValue(key string, value int) error {
 	return t.NumberValue(value)
 }
 
-func (t *tokenWriter) KeyAndNull(key string) error {
+func (t *tokenWriter) KeyAndIntegerValue(key string, value int) error {
+	err := t.Key(key)
+	if err != nil {
+		return err
+	}
+
+	return t.IntegerValue(value)
+}
+
+func (t *tokenWriter) KeyAndNullValue(key string) error {
 	err := t.Key(key)
 	if err != nil {
 		return err
