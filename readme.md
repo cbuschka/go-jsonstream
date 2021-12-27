@@ -2,6 +2,19 @@
 
 ### A json token stream implementation written in golang
 
+## Features
+
+* straight forward api
+* structure check
+* end state check on Close()
+
+## Limitations
+
+* still no character escaping in keys and values
+* no reader interface
+
+## Usage
+
 ```go
 package examples
 
