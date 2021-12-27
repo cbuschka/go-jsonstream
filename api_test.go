@@ -78,8 +78,7 @@ func TestWritesObjectNoIndentViaWritert(t *testing.T) {
 	expectedJson := "{\"key\":\"value\"}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
 		_ = wr.StartObject()
-		_ = wr.Key("key")
-		_ = wr.String("value")
+		_ = wr.KeyAndStringValue("key", "value")
 		return wr.EndObject()
 	})
 }

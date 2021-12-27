@@ -501,3 +501,39 @@ func (t *tokenWriter) addMissingTokens(token Token) error {
 
 	return nil
 }
+
+func (t *tokenWriter) KeyAndStringValue(key string, value string) error {
+	err := t.Key(key)
+	if err != nil {
+		return err
+	}
+
+	return t.String(value)
+}
+
+func (t *tokenWriter) KeyAndBooleanValue(key string, value bool) error {
+	err := t.Key(key)
+	if err != nil {
+		return err
+	}
+
+	return t.Boolean(value)
+}
+
+func (t *tokenWriter) KeyAndNumberValue(key string, value int) error {
+	err := t.Key(key)
+	if err != nil {
+		return err
+	}
+
+	return t.Number(value)
+}
+
+func (t *tokenWriter) KeyAndNull(key string) error {
+	err := t.Key(key)
+	if err != nil {
+		return err
+	}
+
+	return t.Null()
+}
