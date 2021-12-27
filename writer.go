@@ -3,6 +3,7 @@ package jsonstream
 import (
 	"fmt"
 	"io"
+	"strconv"
 )
 
 type tokenWriterState int
@@ -107,6 +108,11 @@ func (t *tokenWriter) checkTokenAllowed(currTokenType TokenType, allowedStates .
 }
 
 func (t *tokenWriter) WriteToken(token Token) error {
+
+	err := t.addMissingTokens(token)
+	if err != nil {
+		return err
+	}
 
 	switch token.Type {
 	case TT_OBJECT_START:
@@ -435,6 +441,62 @@ func (t *tokenWriter) Close() error {
 	closer, isCloser := t.wr.(io.Closer)
 	if isCloser {
 		return closer.Close()
+	}
+
+	return nil
+}
+
+func (t *tokenWriter) StartObject() error {
+	return t.WriteToken(Token{Type: TT_OBJECT_START, Value: ""})
+}
+func (t *tokenWriter) EndObject() error {
+	return t.WriteToken(Token{Type: TT_OBJECT_END, Value: ""})
+}
+func (t *tokenWriter) Key(key string) error {
+	return t.WriteToken(Token{Type: TT_KEY, Value: key})
+}
+func (t *tokenWriter) StartArray() error {
+	return t.WriteToken(Token{Type: TT_ARRAY_START, Value: ""})
+}
+func (t *tokenWriter) EndArray() error {
+	return t.WriteToken(Token{Type: TT_ARRAY_END, Value: ""})
+}
+func (t *tokenWriter) String(value string) error {
+	return t.WriteToken(Token{Type: TT_STRING_VALUE, Value: value})
+}
+func (t *tokenWriter) Boolean(value bool) error {
+	if value {
+		return t.WriteToken(Token{Type: TT_TRUE_VALUE, Value: ""})
+	}
+	return t.WriteToken(Token{Type: TT_FALSE_VALUE, Value: ""})
+}
+func (t *tokenWriter) Number(value int) error {
+	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: strconv.Itoa(value)})
+}
+func (t *tokenWriter) Null() error {
+	return t.WriteToken(Token{Type: TT_NULL_VALUE, Value: ""})
+}
+
+func (t *tokenWriter) addMissingTokens(token Token) error {
+
+	currentState := t.stateStack.Peek()
+	followsValue := token.Type == TT_NUMBER_VALUE ||
+		token.Type == TT_STRING_VALUE ||
+		token.Type == TT_TRUE_VALUE ||
+		token.Type == TT_FALSE_VALUE ||
+		token.Type == TT_OBJECT_START ||
+		token.Type == TT_ARRAY_START
+
+	if followsValue && currentState == TWS_IN_ARRAY_ITEM_SEEN {
+		err := t.WriteToken(Token{Type: TT_COMMA, Value: ""})
+		if err != nil {
+			return err
+		}
+	} else if followsValue && currentState == TWS_IN_OBJECT_KEY_SEEN {
+		err := t.WriteToken(Token{Type: TT_COLON, Value: ""})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
