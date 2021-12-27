@@ -1,8 +1,3 @@
-# go-jsonstream
-
-### A json token stream implementation written in golang
-
-```go
 package examples
 
 import (
@@ -30,12 +25,3 @@ func run() error {
 
 	return nil
 }
-```
-
-[example code](./examples/object_example.go)
-
-## License
-
-Copyright (c) 2021 by [Cornelius Buschka](https://github.com/cbuschka).
-
-[MIT](./license.txt)
