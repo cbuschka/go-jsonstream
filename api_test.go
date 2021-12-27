@@ -30,95 +30,95 @@ func testProducesJsonViaWriter(t *testing.T, expectedJson string, writeFunc func
 func TestWritesStringViaWriter(t *testing.T) {
 	expectedJson := "\"value\""
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.StringValue("value")
+		return wr.WriteStringValue("value")
 	})
 }
 
 func TestWritesNullViaWriter(t *testing.T) {
 	expectedJson := "null"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.NullValue()
+		return wr.WriteNullValue()
 	})
 }
 
 func TestWritesTrueViaWriter(t *testing.T) {
 	expectedJson := "true"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		return wr.BooleanValue(true)
+		return wr.WriteBooleanValue(true)
 	})
 }
 
 func TestWritesEmptyObjecViaWritert(t *testing.T) {
 	expectedJson := "{}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		err := wr.StartObject()
+		err := wr.WriteObjectStart()
 		if err != nil {
 			return err
 		}
-		return wr.EndObject()
+		return wr.WriteObjectEnd()
 	})
 }
 
 func TestWritesEmptyArrayViaWritert(t *testing.T) {
 	expectedJson := "[]"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		err := wr.StartArray()
+		err := wr.WriteArrayStart()
 		if err != nil {
 			return err
 		}
-		return wr.EndArray()
+		return wr.WriteArrayEnd()
 	})
 }
 
 func TestWritesStringArrayNoIndentViaWritert(t *testing.T) {
 	expectedJson := "[\"value0\",\"value1\"]"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		err := wr.StartArray()
+		err := wr.WriteArrayStart()
 		if err != nil {
 			return err
 		}
-		err = wr.StringValue("value0")
+		err = wr.WriteStringValue("value0")
 		if err != nil {
 			return err
 		}
-		err = wr.StringValue("value1")
+		err = wr.WriteStringValue("value1")
 		if err != nil {
 			return err
 		}
-		return wr.EndArray()
+		return wr.WriteArrayEnd()
 	})
 }
 
 func TestWritesObjectNoIndentViaWritert(t *testing.T) {
 	expectedJson := "{\"key\":\"value\"}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		err := wr.StartObject()
+		err := wr.WriteObjectStart()
 		if err != nil {
 			return err
 		}
-		err = wr.KeyAndStringValue("key", "value")
+		err = wr.WriteKeyAndStringValue("key", "value")
 		if err != nil {
 			return err
 		}
-		return wr.EndObject()
+		return wr.WriteObjectEnd()
 	})
 }
 
 func TestWritesObjectWithMutiplePropertiesNoIndentViaWriter(t *testing.T) {
 	expectedJson := "{\"key\":\"value\",\"key2\":\"value2\"}"
 	testProducesJsonViaWriter(t, expectedJson, func(wr Writer) error {
-		err := wr.StartObject()
+		err := wr.WriteObjectStart()
 		if err != nil {
 			return err
 		}
-		err = wr.KeyAndStringValue("key", "value")
+		err = wr.WriteKeyAndStringValue("key", "value")
 		if err != nil {
 			return err
 		}
-		err = wr.KeyAndStringValue("key2", "value2")
+		err = wr.WriteKeyAndStringValue("key2", "value2")
 		if err != nil {
 			return err
 		}
-		return wr.EndObject()
+		return wr.WriteObjectEnd()
 	})
 }

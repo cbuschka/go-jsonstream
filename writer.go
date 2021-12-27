@@ -468,37 +468,37 @@ func (t *tokenWriter) Close() error {
 	return nil
 }
 
-func (t *tokenWriter) StartObject() error {
+func (t *tokenWriter) WriteObjectStart() error {
 	return t.WriteToken(Token{Type: TT_OBJECT_START, Value: ""})
 }
-func (t *tokenWriter) EndObject() error {
+func (t *tokenWriter) WriteObjectEnd() error {
 	return t.WriteToken(Token{Type: TT_OBJECT_END, Value: ""})
 }
-func (t *tokenWriter) Key(key string) error {
+func (t *tokenWriter) WriteKey(key string) error {
 	return t.WriteToken(Token{Type: TT_KEY, Value: key})
 }
-func (t *tokenWriter) StartArray() error {
+func (t *tokenWriter) WriteArrayStart() error {
 	return t.WriteToken(Token{Type: TT_ARRAY_START, Value: ""})
 }
-func (t *tokenWriter) EndArray() error {
+func (t *tokenWriter) WriteArrayEnd() error {
 	return t.WriteToken(Token{Type: TT_ARRAY_END, Value: ""})
 }
-func (t *tokenWriter) StringValue(value string) error {
+func (t *tokenWriter) WriteStringValue(value string) error {
 	return t.WriteToken(Token{Type: TT_STRING_VALUE, Value: value})
 }
-func (t *tokenWriter) BooleanValue(value bool) error {
+func (t *tokenWriter) WriteBooleanValue(value bool) error {
 	if value {
 		return t.WriteToken(Token{Type: TT_TRUE_VALUE, Value: ""})
 	}
 	return t.WriteToken(Token{Type: TT_FALSE_VALUE, Value: ""})
 }
-func (t *tokenWriter) NumberValue(value float64) error {
+func (t *tokenWriter) WriteNumberValue(value float64) error {
 	return t.WriteToken(Token{Type: TT_NUMBER_VALUE, Value: fmt.Sprintf("%e", value)})
 }
-func (t *tokenWriter) IntegerValue(value int) error {
+func (t *tokenWriter) WriteIntegerValue(value int) error {
 	return t.WriteToken(Token{Type: TT_INTEGER_VALUE, Value: strconv.Itoa(value)})
 }
-func (t *tokenWriter) NullValue() error {
+func (t *tokenWriter) WriteNullValue() error {
 	return t.WriteToken(Token{Type: TT_NULL_VALUE, Value: ""})
 }
 
@@ -533,47 +533,47 @@ func (t *tokenWriter) addMissingTokens(token Token) error {
 	return nil
 }
 
-func (t *tokenWriter) KeyAndStringValue(key string, value string) error {
-	err := t.Key(key)
+func (t *tokenWriter) WriteKeyAndStringValue(key string, value string) error {
+	err := t.WriteKey(key)
 	if err != nil {
 		return err
 	}
 
-	return t.StringValue(value)
+	return t.WriteStringValue(value)
 }
 
-func (t *tokenWriter) KeyAndBooleanValue(key string, value bool) error {
-	err := t.Key(key)
+func (t *tokenWriter) WriteKeyAndBooleanValue(key string, value bool) error {
+	err := t.WriteKey(key)
 	if err != nil {
 		return err
 	}
 
-	return t.BooleanValue(value)
+	return t.WriteBooleanValue(value)
 }
 
-func (t *tokenWriter) KeyAndNumberValue(key string, value float64) error {
-	err := t.Key(key)
+func (t *tokenWriter) WriteKeyAndNumberValue(key string, value float64) error {
+	err := t.WriteKey(key)
 	if err != nil {
 		return err
 	}
 
-	return t.NumberValue(value)
+	return t.WriteNumberValue(value)
 }
 
-func (t *tokenWriter) KeyAndIntegerValue(key string, value int) error {
-	err := t.Key(key)
+func (t *tokenWriter) WriteKeyAndIntegerValue(key string, value int) error {
+	err := t.WriteKey(key)
 	if err != nil {
 		return err
 	}
 
-	return t.IntegerValue(value)
+	return t.WriteIntegerValue(value)
 }
 
-func (t *tokenWriter) KeyAndNullValue(key string) error {
-	err := t.Key(key)
+func (t *tokenWriter) WriteKeyAndNullValue(key string) error {
+	err := t.WriteKey(key)
 	if err != nil {
 		return err
 	}
 
-	return t.NullValue()
+	return t.WriteNullValue()
 }
